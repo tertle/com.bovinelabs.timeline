@@ -11,7 +11,7 @@ namespace BovineLabs.Timeline.Authoring
     [TrackClipType(typeof(LookAtStartingDirectionClip))]
     [TrackColor(0, 0.25f, 0)]
     [TrackBindingType(typeof(Transform))]
-    public class LookAtTrack : DOTSTrack
+    public class RotationTrack : DOTSTrack
     {
     }
 }

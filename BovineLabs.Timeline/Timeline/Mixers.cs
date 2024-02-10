@@ -27,4 +27,11 @@ namespace BovineLabs.Timeline
 
         public float3 Add(in float3 a, in float3 b) => a + b;
     }
+
+    public struct QuaternionMixer : IMixer<quaternion>
+    {
+        public quaternion Lerp(in quaternion a, in quaternion b, float s) => math.nlerp(a, b, s);
+
+        public quaternion Add(in quaternion a, in quaternion b) => math.mul(a, b);
+    }
 }

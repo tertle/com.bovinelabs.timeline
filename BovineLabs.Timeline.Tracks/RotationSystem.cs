@@ -1,4 +1,4 @@
-﻿// <copyright file="LookAtSystem.cs" company="BovineLabs">
+﻿// <copyright file="RotationSystem.cs" company="BovineLabs">
 //     Copyright (c) BovineLabs. All rights reserved.
 // </copyright>
 
@@ -18,14 +18,14 @@ namespace BovineLabs.Timeline.Tracks
     using Unity.Transforms;
 
     [UpdateInGroup(typeof(TimelineComponentAnimationGroup))]
-    public partial struct LookAtSystem : ISystem
+    public partial struct RotationSystem : ISystem
     {
-        private NativeParallelHashMap<Entity, MixData<float3>> blendResults;
+        private NativeParallelHashMap<Entity, MixData<quaternion>> blendResults;
 
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            this.blendResults = new NativeParallelHashMap<Entity, MixData<float3>>(64, Allocator.Persistent);
+            this.blendResults = new NativeParallelHashMap<Entity, MixData<quaternion>>(64, Allocator.Persistent);
         }
 
         [BurstCompile]
@@ -38,13 +38,13 @@ namespace BovineLabs.Timeline.Tracks
         public void OnUpdate(ref SystemState state)
         {
             var unblendedQuery = SystemAPI.QueryBuilder()
-                .WithAllRW<LookAtAnimated>()
+                .WithAllRW<RotationAnimated>()
                 .WithAll<TrackBinding, LocalTime, Active>()
                 .WithNone<ClipWeight>()
                 .Build();
 
             var blendedQuery = SystemAPI.QueryBuilder()
-                .WithAllRW<LookAtAnimated>()
+                .WithAllRW<RotationAnimated>()
                 .WithAll<TrackBinding, LocalTime, Active, ClipWeight>()
                 .Build();
 
@@ -63,7 +63,7 @@ namespace BovineLabs.Timeline.Tracks
                 }
                 .ScheduleParallel(state.Dependency);
 
-            dependency2 = new UpdateLookForwardJob
+            dependency2 = new LookAtStartingDirectionJob
                 {
                     LocalTransforms = SystemAPI.GetComponentLookup<LocalTransform>(true),
                 }
@@ -73,7 +73,7 @@ namespace BovineLabs.Timeline.Tracks
             state.Dependency = new AnimateUnblendedJob { BlendData = this.blendResults.AsParallelWriter() }.ScheduleParallel(unblendedQuery, state.Dependency);
             state.Dependency = new AccumulateWeightedAnimationJob { BlendData = this.blendResults }.Schedule(blendedQuery, state.Dependency);
 
-            state.Dependency = new WriteAnimatedValuesJob
+            state.Dependency = new WriteRotationJob
                 {
                     BlendData = this.blendResults,
                     LocalTransforms = SystemAPI.GetComponentLookup<LocalTransform>(),
@@ -84,7 +84,7 @@ namespace BovineLabs.Timeline.Tracks
         [BurstCompile]
         private struct Resize : IJob
         {
-            public NativeParallelHashMap<Entity, MixData<float3>> BlendData;
+            public NativeParallelHashMap<Entity, MixData<quaternion>> BlendData;
 
             public int UnblendedCount;
             public int BlendedCount;
@@ -105,7 +105,7 @@ namespace BovineLabs.Timeline.Tracks
             [ReadOnly]
             public ComponentLookup<LocalTransform> LocalTransforms;
 
-            private void Execute(ref LookAtAnimated lookAtAnimated, in TrackBinding trackBinding, in LookAtTarget lookAtTarget)
+            private void Execute(ref RotationAnimated rotationAnimated, in TrackBinding trackBinding, in LookAtTarget lookAtTarget)
             {
                 if (!this.LocalTransforms.TryGetComponent(trackBinding.Value, out var bt))
                 {
@@ -117,28 +117,26 @@ namespace BovineLabs.Timeline.Tracks
                     return;
                 }
 
-                // For the sake of normalization we use a normalized direction
-                var dir = math.normalizesafe(lt.Position - bt.Position);
-                lookAtAnimated.DefaultValue = lt.Position + dir;
+                rotationAnimated.DefaultValue = quaternion.LookRotation(lt.Position - bt.Position, math.up());
             }
         }
 
         [WithAll(typeof(Active))]
         [WithNone(typeof(ActivePrevious))] // we only update this once and cache it
         [WithAll(typeof(LookAtStartingDirection))]
-        private partial struct UpdateLookForwardJob : IJobEntity
+        private partial struct LookAtStartingDirectionJob : IJobEntity
         {
             [ReadOnly]
             public ComponentLookup<LocalTransform> LocalTransforms;
 
-            private void Execute(ref LookAtAnimated lookAtAnimated, in TrackBinding trackBinding)
+            private void Execute(ref RotationAnimated rotationAnimated, in TrackBinding trackBinding)
             {
                 if (!this.LocalTransforms.TryGetComponent(trackBinding.Value, out var bindingTransform))
                 {
                     return;
                 }
 
-                lookAtAnimated.DefaultValue = bindingTransform.Position + bindingTransform.Forward();
+                rotationAnimated.DefaultValue = bindingTransform.Rotation;
             }
         }
 
@@ -147,11 +145,11 @@ namespace BovineLabs.Timeline.Tracks
         [BurstCompile]
         private partial struct AnimateUnblendedJob : IJobEntity
         {
-            public NativeParallelHashMap<Entity, MixData<float3>>.ParallelWriter BlendData;
+            public NativeParallelHashMap<Entity, MixData<quaternion>>.ParallelWriter BlendData;
 
-            private void Execute(ref LookAtAnimated animated, in TrackBinding binding, in LocalTime localTime)
+            private void Execute(ref RotationAnimated animated, in TrackBinding binding, in LocalTime localTime)
             {
-                JobHelpers.AnimateUnblendExecuteGeneric<float3, BlobCurveSampler3, LookAtAnimated>(binding, localTime, ref animated, this.BlendData);
+                JobHelpers.AnimateUnblendExecuteGeneric<quaternion, BlobCurveSampler4<quaternion>, RotationAnimated>(binding, localTime, ref animated, this.BlendData);
             }
         }
 
@@ -159,19 +157,19 @@ namespace BovineLabs.Timeline.Tracks
         [BurstCompile]
         private partial struct AccumulateWeightedAnimationJob : IJobEntity
         {
-            public NativeParallelHashMap<Entity, MixData<float3>> BlendData;
+            public NativeParallelHashMap<Entity, MixData<quaternion>> BlendData;
 
-            private void Execute(ref LookAtAnimated animated, in TrackBinding binding, in LocalTime localTime, in ClipWeight clip)
+            private void Execute(ref RotationAnimated animated, in TrackBinding binding, in LocalTime localTime, in ClipWeight clip)
             {
-                JobHelpers.AccumulateWeightedAnimationExecuteGeneric<float3, BlobCurveSampler3, LookAtAnimated>(binding, localTime, ref animated, clip, this.BlendData);
+                JobHelpers.AccumulateWeightedAnimationExecuteGeneric<quaternion, BlobCurveSampler4<quaternion>, RotationAnimated>(binding, localTime, ref animated, clip, this.BlendData);
             }
         }
 
         [BurstCompile]
-        private struct WriteAnimatedValuesJob : IJobParallelHashMapDefer
+        private struct WriteRotationJob : IJobParallelHashMapDefer
         {
             [ReadOnly]
-            public NativeParallelHashMap<Entity, MixData<float3>> BlendData;
+            public NativeParallelHashMap<Entity, MixData<quaternion>> BlendData;
 
             [NativeDisableParallelForRestriction]
             public ComponentLookup<LocalTransform> LocalTransforms;
@@ -186,8 +184,7 @@ namespace BovineLabs.Timeline.Tracks
                     return;
                 }
 
-                var blend = JobHelpers.Blend<float3, Float3Mixer>(ref target, lt.ValueRO.Forward());
-                lt.ValueRW.Rotation = quaternion.LookRotationSafe(blend - lt.ValueRO.Position, new float3(0, 1, 0));
+                lt.ValueRW.Rotation = JobHelpers.Blend<quaternion, QuaternionMixer>(ref target, lt.ValueRO.Rotation);
             }
         }
     }

@@ -1,4 +1,4 @@
-// <copyright file="LookAtAnimated.cs" company="BovineLabs">
+// <copyright file="RotationAnimated.cs" company="BovineLabs">
 //     Copyright (c) BovineLabs. All rights reserved.
 // </copyright>
 
@@ -9,11 +9,11 @@ namespace BovineLabs.Timeline.Tracks.Data
     using Unity.Mathematics;
     using Unity.Properties;
 
-    public struct LookAtAnimated : IAnimatedComponent<float3, BlobCurveSampler3>
+    public struct RotationAnimated : IAnimatedComponent<quaternion, BlobCurveSampler4<quaternion>>
     {
         [CreateProperty]
-        public float3 DefaultValue { get; set; }
+        public quaternion DefaultValue { get; set; }
 
-        public BlobCurveSampler3 AnimationData { get; set; }
+        public BlobCurveSampler4<quaternion> AnimationData { get; }
     }
 }

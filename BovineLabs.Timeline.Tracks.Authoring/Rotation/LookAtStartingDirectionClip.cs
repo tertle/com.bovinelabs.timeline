@@ -16,7 +16,7 @@ namespace BovineLabs.Timeline.Authoring
         public override void Bake(Entity clipEntity, BakingContext context)
         {
             context.Baker.AddComponent<LookAtStartingDirection>(clipEntity);
-            context.Baker.AddComponent<LookAtAnimated>(clipEntity);
+            context.Baker.AddComponent<RotationAnimated>(clipEntity);
             context.Baker.AddTransformUsageFlags(context.Binding!.Target, TransformUsageFlags.Dynamic);
 
             base.Bake(clipEntity, context);

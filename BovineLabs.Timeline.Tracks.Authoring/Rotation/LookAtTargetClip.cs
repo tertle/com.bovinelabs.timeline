@@ -30,7 +30,7 @@ namespace BovineLabs.Timeline.Authoring
                 Target = context.Baker.GetEntity(target, TransformUsageFlags.Dynamic),
             });
 
-            context.Baker.AddComponent<LookAtAnimated>(clipEntity);
+            context.Baker.AddComponent<RotationAnimated>(clipEntity);
             context.Baker.AddTransformUsageFlags(context.Binding!.Target, TransformUsageFlags.Dynamic);
 
             base.Bake(clipEntity, context);
