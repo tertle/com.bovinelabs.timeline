@@ -4,9 +4,8 @@
   "version": "0.1.0",
   "unity": "2023.3",
   "unityRelease": "0b5",
-  "displayName": "BovineLabs Saving",
+  "displayName": "BovineLabs Timeline",
   "dependencies": {
     "com.unity.entities": "1.2.0-pre.6"
-  },
-  "type": "library"
+  }
 }
