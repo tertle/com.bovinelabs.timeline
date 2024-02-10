@@ -4,10 +4,7 @@
 
 namespace BovineLabs.Timeline.Authoring
 {
-    using System;
     using System.Collections.Generic;
-    using BovineLabs.Timeline.Data.Schedular;
-    using Unity.IntegerTime;
     using UnityEngine.Timeline;
 
     /// <summary>

@@ -4,7 +4,6 @@
 
 namespace BovineLabs.Timeline.Authoring
 {
-    using System;
     using System.Collections.Generic;
     using BovineLabs.Timeline.Data;
     using BovineLabs.Timeline.Data.Schedular;

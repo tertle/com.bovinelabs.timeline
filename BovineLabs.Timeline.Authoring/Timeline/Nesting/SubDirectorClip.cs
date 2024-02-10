@@ -2,10 +2,9 @@
 //     Copyright (c) BovineLabs. All rights reserved.
 // </copyright>
 
-namespace BovineLabs.Timeline.Authoring.Nesting
+namespace BovineLabs.Timeline.Authoring
 {
     using System;
-    using System.Linq;
     using Unity.Entities;
     using UnityEngine;
     using UnityEngine.Playables;
@@ -73,7 +72,7 @@ namespace BovineLabs.Timeline.Authoring.Nesting
         public ClipCaps clipCaps => ClipCaps.ClipIn | ClipCaps.SpeedMultiplier; /*| ClipCaps.Looping;*/
 
         /// <summary>This is the default duration of the clip used by the UI</summary>
-        public override double duration => /*Take != null ? Take.RemappedDuration : */DefaultClipDuration;
+        public override double duration => /*Take != null ? Take.RemappedDuration : */this.DefaultClipDuration;
 
         // /// <summary>Gather nested playable directors</summary>
         // public void GetNestedDirectors(IExposedPropertyTable propertyTable, List<PlayableDirector> nestedDirectors)

@@ -2,9 +2,8 @@
 //     Copyright (c) BovineLabs. All rights reserved.
 // </copyright>
 
-namespace BovineLabs.Timeline.Tracks.Authoring
+namespace BovineLabs.Timeline.Authoring
 {
-    using BovineLabs.Timeline.Authoring;
     using BovineLabs.Timeline.Tracks.Data;
     using Unity.Entities;
     using UnityEngine.Timeline;

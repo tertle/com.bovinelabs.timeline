@@ -1,6 +1,6 @@
 {
     "name": "BovineLabs.Timeline.Tracks.Authoring",
-    "rootNamespace": "",
+    "rootNamespace": "BovineLabs.Timeline.Authoring",
     "references": [
         "BovineLabs.Core",
         "BovineLabs.Core.Authoring",

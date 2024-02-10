@@ -2,7 +2,7 @@
 //     Copyright (c) BovineLabs. All rights reserved.
 // </copyright>
 
-namespace BovineLabs.Timeline.Authoring.Nesting
+namespace BovineLabs.Timeline.Authoring
 {
     using UnityEngine.Timeline;
 
