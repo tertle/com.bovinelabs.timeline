@@ -18,7 +18,7 @@ namespace BovineLabs.Timeline.Tracks
     using Unity.Transforms;
 
     [UpdateInGroup(typeof(TimelineComponentAnimationGroup))]
-    public partial struct RotationSystem : ISystem
+    public partial struct RotationTrackSystem : ISystem
     {
         private NativeParallelHashMap<Entity, MixData<quaternion>> blendResults;
 
@@ -37,6 +37,19 @@ namespace BovineLabs.Timeline.Tracks
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
+            // TODO these could be parallel if we turned off safety
+            var dependency1 = new UpdateLookAtTargetJob
+                {
+                    LocalTransforms = SystemAPI.GetComponentLookup<LocalTransform>(true),
+                }
+                .ScheduleParallel(state.Dependency);
+
+            dependency1 = new LookAtStartingDirectionJob
+                {
+                    LocalTransforms = SystemAPI.GetComponentLookup<LocalTransform>(true),
+                }
+                .ScheduleParallel(dependency1);
+
             var unblendedQuery = SystemAPI.QueryBuilder()
                 .WithAllRW<RotationAnimated>()
                 .WithAll<TrackBinding, LocalTime, Active>()
@@ -48,26 +61,13 @@ namespace BovineLabs.Timeline.Tracks
                 .WithAll<TrackBinding, LocalTime, Active, ClipWeight>()
                 .Build();
 
-            var dependency1 = new Resize
+            var dependency2 = new ResizeJob
                 {
                     BlendData = this.blendResults,
                     UnblendedCount = unblendedQuery.CalculateEntityCountWithoutFiltering(),
                     BlendedCount = blendedQuery.CalculateEntityCountWithoutFiltering(),
                 }
                 .Schedule(state.Dependency);
-
-            // TODO these could be parallel if we turned off safety
-            var dependency2 = new UpdateLookAtTargetJob
-                {
-                    LocalTransforms = SystemAPI.GetComponentLookup<LocalTransform>(true),
-                }
-                .ScheduleParallel(state.Dependency);
-
-            dependency2 = new LookAtStartingDirectionJob
-                {
-                    LocalTransforms = SystemAPI.GetComponentLookup<LocalTransform>(true),
-                }
-                .ScheduleParallel(dependency2);
 
             state.Dependency = JobHandle.CombineDependencies(dependency1, dependency2);
             state.Dependency = new AnimateUnblendedJob { BlendData = this.blendResults.AsParallelWriter() }.ScheduleParallel(unblendedQuery, state.Dependency);
@@ -82,7 +82,7 @@ namespace BovineLabs.Timeline.Tracks
         }
 
         [BurstCompile]
-        private struct Resize : IJob
+        private struct ResizeJob : IJob
         {
             public NativeParallelHashMap<Entity, MixData<quaternion>> BlendData;
 

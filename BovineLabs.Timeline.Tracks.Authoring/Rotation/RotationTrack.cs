@@ -1,4 +1,4 @@
-﻿// <copyright file="LookAtTargetTrack.cs" company="BovineLabs">
+﻿// <copyright file="RotationTrack.cs" company="BovineLabs">
 //     Copyright (c) BovineLabs. All rights reserved.
 // </copyright>
 
