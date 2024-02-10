@@ -18,7 +18,7 @@ namespace BovineLabs.Timeline.Authoring
         /// <inheritdoc/>
         public override void Bake(Entity clipEntity, BakingContext context)
         {
-            Transform target = null;
+            Transform? target = null;
 
             if (context.Director != null)
             {
