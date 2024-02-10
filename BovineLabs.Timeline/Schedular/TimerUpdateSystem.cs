@@ -4,10 +4,8 @@
 
 namespace BovineLabs.Timeline.Schedular
 {
-    using System;
     using BovineLabs.Core.Extensions;
-    using BovineLabs.Core.Internal;
-    using BovineLabs.Reaction.Data;
+    using BovineLabs.Timeline.Data;
     using BovineLabs.Timeline.Data.Schedular;
     using Unity.Burst;
     using Unity.Burst.Intrinsics;
@@ -15,7 +13,6 @@ namespace BovineLabs.Timeline.Schedular
     using Unity.Collections.LowLevel.Unsafe;
     using Unity.Entities;
     using Unity.IntegerTime;
-    using Unity.Mathematics;
 
     [UpdateAfter(typeof(ClockUpdateSystem))]
     [UpdateInGroup(typeof(ScheduleSystemGroup))]
@@ -28,12 +25,12 @@ namespace BovineLabs.Timeline.Schedular
         public void OnCreate(ref SystemState state)
         {
             this.stoppedQuery = SystemAPI.QueryBuilder()
-                .WithAll<ActivePrevious, TimerDataLink>()
-                .WithDisabled<Active>()
+                .WithAll<TimelineActivePrevious, TimerDataLink>()
+                .WithDisabled<TimelineActive>()
                 .WithPresent<TimerPaused>()
                 .Build();
 
-            this.stoppedQuery.SetChangedVersionFilter(ComponentType.ReadWrite<Active>());
+            this.stoppedQuery.SetChangedVersionFilter(ComponentType.ReadWrite<TimelineActive>());
         }
 
         /// <inheritdoc/>
@@ -43,14 +40,14 @@ namespace BovineLabs.Timeline.Schedular
             state.Dependency = new TimerStartedJob
                 {
                     TimerDatas = SystemAPI.GetComponentLookup<TimerData>(),
-                    Actives = SystemAPI.GetComponentLookup<Active>(),
+                    Actives = SystemAPI.GetComponentLookup<TimelineActive>(),
                 }
                 .ScheduleParallel(state.Dependency);
 
             state.Dependency = new TimersUpdateJob
                 {
                     TimerDatas = SystemAPI.GetComponentLookup<TimerData>(),
-                    Actives = SystemAPI.GetComponentLookup<Active>(),
+                    Actives = SystemAPI.GetComponentLookup<TimelineActive>(),
                     TimerPauseds = SystemAPI.GetComponentLookup<TimerPaused>(),
                     TimerDataLinks = SystemAPI.GetBufferLookup<TimerDataLink>(true),
                     CompositeTimerLinks = SystemAPI.GetBufferLookup<CompositeTimerLink>(true),
@@ -63,14 +60,14 @@ namespace BovineLabs.Timeline.Schedular
                 {
                     TimerDataLinks = SystemAPI.GetBufferTypeHandle<TimerDataLink>(true),
                     TimerPausedHandle = SystemAPI.GetComponentTypeHandle<TimerPaused>(),
-                    Actives = SystemAPI.GetComponentLookup<Active>(),
+                    Actives = SystemAPI.GetComponentLookup<TimelineActive>(),
                 }
                 .ScheduleParallel(this.stoppedQuery, state.Dependency);
         }
 
-        [WithAll(typeof(Active))]
-        [WithDisabled(typeof(ActivePrevious))]
-        [WithChangeFilter(typeof(Active))]
+        [WithAll(typeof(TimelineActive))]
+        [WithDisabled(typeof(TimelineActivePrevious))]
+        [WithChangeFilter(typeof(TimelineActive))]
         [BurstCompile]
         private partial struct TimerStartedJob : IJobEntity
         {
@@ -78,7 +75,7 @@ namespace BovineLabs.Timeline.Schedular
             public ComponentLookup<TimerData> TimerDatas;
 
             [NativeDisableParallelForRestriction]
-            public ComponentLookup<Active> Actives;
+            public ComponentLookup<TimelineActive> Actives;
 
             private void Execute(ref Timer timer, in ClockData clockData, in DynamicBuffer<TimerDataLink> timerDataLinks)
             {
@@ -110,7 +107,7 @@ namespace BovineLabs.Timeline.Schedular
             public ComponentTypeHandle<TimerPaused> TimerPausedHandle;
 
             [NativeDisableParallelForRestriction]
-            public ComponentLookup<Active> Actives;
+            public ComponentLookup<TimelineActive> Actives;
 
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
@@ -130,7 +127,7 @@ namespace BovineLabs.Timeline.Schedular
             }
         }
 
-        [WithAll(typeof(Active), typeof(ActivePrevious))]
+        [WithAll(typeof(TimelineActive), typeof(TimelineActivePrevious))]
         [WithPresent(typeof(TimerPaused))]
         [WithNone(typeof(CompositeTimer))]
         [BurstCompile]
@@ -143,7 +140,7 @@ namespace BovineLabs.Timeline.Schedular
             public ComponentLookup<TimerPaused> TimerPauseds;
 
             [NativeDisableParallelForRestriction]
-            public ComponentLookup<Active> Actives;
+            public ComponentLookup<TimelineActive> Actives;
 
             [ReadOnly]
             [NativeDisableContainerSafetyRestriction]
@@ -255,7 +252,7 @@ namespace BovineLabs.Timeline.Schedular
         }
 
         [BurstCompile]
-        [WithAll(typeof(Active), typeof(ActivePrevious))]
+        [WithAll(typeof(TimelineActive), typeof(TimelineActivePrevious))]
         private partial struct TimerCompositeUpdateJob : IJobEntity
         {
             private void Execute()

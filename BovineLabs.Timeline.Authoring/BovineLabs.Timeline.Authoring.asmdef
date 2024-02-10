@@ -6,7 +6,6 @@
         "BovineLabs.Core.Authoring",
         "BovineLabs.Core.Extensions",
         "BovineLabs.Core.Extensions.Authoring",
-        "BovineLabs.Reaction.Data",
         "BovineLabs.Timeline.Data",
         "Unity.Burst",
         "Unity.Collections",

@@ -4,12 +4,11 @@
 
 namespace BovineLabs.Timeline.Schedular
 {
-    using BovineLabs.Active;
-    using BovineLabs.Reaction;
     using Unity.Entities;
 
-    [UpdateAfter(typeof(ActiveSystemGroup))]
-    [UpdateInGroup(typeof(ReactionSystemGroup))]
+    // [UpdateAfter(typeof(ActiveSystemGroup))]
+    // [UpdateInGroup(typeof(ReactionSystemGroup))]
+    [UpdateInGroup(typeof(TimelineSystemGroup))]
     public partial class ScheduleSystemGroup : ComponentSystemGroup
     {
     }

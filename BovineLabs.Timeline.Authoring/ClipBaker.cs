@@ -4,9 +4,7 @@
 
 namespace BovineLabs.Timeline.Authoring
 {
-    using BovineLabs.Core.Authoring.EntityCommands;
     using BovineLabs.Core.Collections;
-    using BovineLabs.Reaction.Data;
     using BovineLabs.Timeline.Data;
     using BovineLabs.Timeline.Data.Schedular;
     using Unity.Entities;
@@ -19,8 +17,7 @@ namespace BovineLabs.Timeline.Authoring
         {
             context.SharedContextValues.TimeDataEntities.Add(clipEntity);
 
-            var commands = new BakerCommands(context.Baker, clipEntity);
-            default(ActiveBuilder).ApplyTo(ref commands);
+            context.AddActive(clipEntity);
 
             context.Baker.AddComponent<TimerData>(clipEntity);
             context.Baker.AddComponent(clipEntity, clip.GetTimeTransform());

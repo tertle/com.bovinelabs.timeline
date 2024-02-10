@@ -6,7 +6,7 @@ namespace BovineLabs.Timeline.Schedular
 {
     using BovineLabs.Core.Assertions;
     using BovineLabs.Core.Time;
-    using BovineLabs.Reaction.Data;
+    using BovineLabs.Timeline.Data;
     using BovineLabs.Timeline.Data.Schedular;
     using Unity.Burst;
     using Unity.Burst.Intrinsics;
@@ -29,7 +29,7 @@ namespace BovineLabs.Timeline.Schedular
         {
             var query = SystemAPI.QueryBuilder()
                 .WithAllRW<ClockData>()
-                .WithAll<Active>() // We don't check per entity but this is just used to early out entire chunks
+                .WithAll<TimelineActive>() // We don't check per entity but this is just used to early out entire chunks
                 .WithAny<ClockTypeConstant, ClockTypeGameTime, ClockTypeUnscaledGameTime, ClockTypeRealTime>()
                 .WithOptions(EntityQueryOptions.FilterWriteGroup)
                 .Build();

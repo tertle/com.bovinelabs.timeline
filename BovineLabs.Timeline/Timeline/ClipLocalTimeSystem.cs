@@ -4,7 +4,6 @@
 
 namespace BovineLabs.Timeline
 {
-    using BovineLabs.Reaction.Data;
     using BovineLabs.Timeline.Data;
     using BovineLabs.Timeline.Data.Schedular;
     using Unity.Burst;
@@ -14,7 +13,7 @@ namespace BovineLabs.Timeline
     using Unity.Entities;
     using Unity.IntegerTime;
 
-    [UpdateInGroup(typeof(TimelineSystemGroup))]
+    [UpdateInGroup(typeof(TimelineUpdateSystemGroup))]
     public partial struct ClipLocalTimeSystem : ISystem
     {
         /// <inheritdoc/>
@@ -30,7 +29,7 @@ namespace BovineLabs.Timeline
                 .ScheduleParallel(state.Dependency);
         }
 
-        [WithAll(typeof(Active))]
+        [WithAll(typeof(TimelineActive))]
         [WithChangeFilter(typeof(TimerData))]
         [BurstCompile]
         private unsafe partial struct LocalTimeJob : IJobEntity, IJobEntityChunkBeginEnd

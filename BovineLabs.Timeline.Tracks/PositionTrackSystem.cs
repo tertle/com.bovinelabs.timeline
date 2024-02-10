@@ -6,7 +6,6 @@ namespace BovineLabs.Timeline.Tracks
 {
     using BovineLabs.Core.Collections;
     using BovineLabs.Core.Jobs;
-    using BovineLabs.Reaction.Data;
     using BovineLabs.Timeline;
     using BovineLabs.Timeline.Data;
     using BovineLabs.Timeline.Tracks.Data;
@@ -46,13 +45,13 @@ namespace BovineLabs.Timeline.Tracks
 
             var unblendedQuery = SystemAPI.QueryBuilder()
                 .WithAllRW<PositionAnimated>()
-                .WithAll<TrackBinding, LocalTime, Active>()
+                .WithAll<TrackBinding, LocalTime, TimelineActive>()
                 .WithNone<ClipWeight>()
                 .Build();
 
             var blendedQuery = SystemAPI.QueryBuilder()
                 .WithAllRW<PositionAnimated>()
-                .WithAll<TrackBinding, LocalTime, Active, ClipWeight>()
+                .WithAll<TrackBinding, LocalTime, TimelineActive, ClipWeight>()
                 .Build();
 
             var dependency2 = new ResizeJob
@@ -75,8 +74,8 @@ namespace BovineLabs.Timeline.Tracks
                 .ScheduleParallel(this.blendResults, 64, state.Dependency);
         }
 
-        [WithAll(typeof(Active))]
-        [WithNone(typeof(ActivePrevious))] // we only update this once and cache it
+        [WithAll(typeof(TimelineActive))]
+        [WithNone(typeof(TimelineActivePrevious))] // we only update this once and cache it
         [WithAll(typeof(MoveToStartingPosition))]
         private partial struct MoveToStartingPositionJob : IJobEntity
         {
@@ -112,7 +111,7 @@ namespace BovineLabs.Timeline.Tracks
             }
         }
 
-        [WithAll(typeof(Active))]
+        [WithAll(typeof(TimelineActive))]
         [WithNone(typeof(ClipWeight))]
         [BurstCompile]
         private partial struct AnimateUnblendedJob : IJobEntity
@@ -125,7 +124,7 @@ namespace BovineLabs.Timeline.Tracks
             }
         }
 
-        [WithAll(typeof(Active))]
+        [WithAll(typeof(TimelineActive))]
         [BurstCompile]
         private partial struct AccumulateWeightedAnimationJob : IJobEntity
         {

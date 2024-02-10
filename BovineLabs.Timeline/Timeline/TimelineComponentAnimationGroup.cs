@@ -7,7 +7,7 @@ namespace BovineLabs.Timeline
     using Unity.Entities;
 
     [UpdateInGroup(typeof(TimelineSystemGroup))]
-    [UpdateAfter(typeof(ClipWeightSystem))]
+    [UpdateAfter(typeof(TimelineUpdateSystemGroup))]
     public partial class TimelineComponentAnimationGroup : ComponentSystemGroup
     {
     }

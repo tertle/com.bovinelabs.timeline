@@ -4,7 +4,7 @@
 
 namespace BovineLabs.Timeline.Schedular
 {
-    using BovineLabs.Reaction.Data;
+    using BovineLabs.Timeline.Data;
     using BovineLabs.Timeline.Data.Schedular;
     using Unity.Entities;
     using Unity.IntegerTime;
@@ -12,7 +12,7 @@ namespace BovineLabs.Timeline.Schedular
     public static class TimerRangeImpl
     {
         public static bool ApplyTimerRange(
-            ref Timer timer, ref TimerRange range, DiscreteTime previousTime, EnabledRefRW<TimerPaused> timerPauseds, EnabledRefRW<Active> actives)
+            ref Timer timer, ref TimerRange range, DiscreteTime previousTime, EnabledRefRW<TimerPaused> timerPauseds, EnabledRefRW<TimelineActive> actives)
         {
             switch (range.Behaviour)
             {
@@ -36,7 +36,7 @@ namespace BovineLabs.Timeline.Schedular
             return false;
         }
 
-        private static bool ApplyAutoStop(ref Timer timer, ref TimerRange range, DiscreteTime previousTime, EnabledRefRW<Active> actives)
+        private static bool ApplyAutoStop(ref Timer timer, ref TimerRange range, DiscreteTime previousTime, EnabledRefRW<TimelineActive> actives)
         {
             timer.Time = timer.Time.Max(range.Range.Start);
             if (timer.Time >= range.Range.End)

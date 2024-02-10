@@ -1,4 +1,4 @@
-﻿// <copyright file="TimelineBaker.cs" company="BovineLabs">
+﻿// <copyright file="PlayableDirectorBaker.cs" company="BovineLabs">
 //     Copyright (c) BovineLabs. All rights reserved.
 // </copyright>
 
@@ -7,7 +7,6 @@ namespace BovineLabs.Timeline.Authoring
     using System;
     using System.Collections.Generic;
     using BovineLabs.Core.Authoring.EntityCommands;
-    using BovineLabs.Reaction.Data;
     using BovineLabs.Timeline.Data;
     using BovineLabs.Timeline.Data.Schedular;
     using Unity.Entities;
@@ -27,13 +26,6 @@ namespace BovineLabs.Timeline.Authoring
             }
 
             var entity = this.CreateAdditionalEntity(TransformUsageFlags.ManualOverride);
-
-            // TODO
-            var builder = default(ActiveBuilder);
-            // builder.WithActiveManual(true);
-            var commands = new BakerCommands(this, entity);
-            builder.ApplyTo(ref commands);
-
             this.AddComponent(entity, new Timer { Time = new DiscreteTime(director.initialTime), TimeScale = 1 });
             this.AddComponent<TimerPaused>(entity);
             this.SetComponentEnabled<TimerPaused>(entity, false);
@@ -98,6 +90,8 @@ namespace BovineLabs.Timeline.Authoring
             }
 
             var context = new BakingContext(this, entity, this.GetEntity(TransformUsageFlags.None), director);
+
+            context.AddActive(entity);
 
             ConvertPlayableDirector(context, ActiveRange.CompleteRange);
 

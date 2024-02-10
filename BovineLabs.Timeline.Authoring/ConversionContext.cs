@@ -7,7 +7,6 @@ namespace BovineLabs.Timeline.Authoring
     using System;
     using System.Collections.Generic;
     using BovineLabs.Core.Authoring.EntityCommands;
-    using BovineLabs.Reaction.Data;
     using BovineLabs.Timeline.Data;
     using BovineLabs.Timeline.Data.Schedular;
     using Unity.Entities;
@@ -156,9 +155,7 @@ namespace BovineLabs.Timeline.Authoring
                 masterTimer = parent.SourceTimer;
             }
 
-            var builder = default(ActiveBuilder);
-            var commands = new BakerCommands(context.Baker, entity);
-            builder.ApplyTo(ref commands);
+            context.AddActive(entity);
 
             context.Baker.AddComponent(entity, new Timer { TimeScale = 1 });
 
@@ -196,8 +193,7 @@ namespace BovineLabs.Timeline.Authoring
             }
 
             var linked = CreateEntity(context, context.Track.name);
-            var commands = new BakerCommands(context.Baker, linked);
-            default(ActiveBuilder).ApplyTo(ref commands);
+            context.AddActive(linked);
 
             context.Baker.AddComponent(linked, new TrackBinding { Value = context.Binding.Target });
             context.SharedContextValues.BindingToClip.Add((context.Binding.Name, linked));
@@ -252,6 +248,15 @@ namespace BovineLabs.Timeline.Authoring
             }
 
             return new Binding(track.name, entity);
+        }
+
+        public static void AddActive(this BakingContext context, Entity entity)
+        {
+            context.Baker.AddComponent<TimelineActive>(entity);
+            context.Baker.SetComponentEnabled<TimelineActive>(entity, false);
+
+            context.Baker.AddComponent<TimelineActivePrevious>(entity);
+            context.Baker.SetComponentEnabled<TimelineActivePrevious>(entity, false);
         }
     }
 }

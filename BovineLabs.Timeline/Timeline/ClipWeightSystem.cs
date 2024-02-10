@@ -8,7 +8,7 @@ namespace BovineLabs.Timeline
     using Unity.Burst;
     using Unity.Entities;
 
-    [UpdateInGroup(typeof(TimelineSystemGroup))]
+    [UpdateInGroup(typeof(TimelineUpdateSystemGroup))]
     [UpdateAfter(typeof(ClipLocalTimeSystem))]
     public partial struct ClipWeightSystem : ISystem
     {

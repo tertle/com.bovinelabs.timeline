@@ -6,6 +6,7 @@
   "unityRelease": "0b5",
   "displayName": "BovineLabs Timeline",
   "dependencies": {
-    "com.unity.entities": "1.2.0-pre.6"
+    "com.unity.entities": "1.2.0-pre.6",
+    "com.bovinelabs.core": "1.2.5"
   }
 }
