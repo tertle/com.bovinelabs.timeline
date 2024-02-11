@@ -25,7 +25,7 @@ namespace BovineLabs.Timeline.Authoring
                 return;
             }
 
-            var entity = this.CreateAdditionalEntity(TransformUsageFlags.ManualOverride);
+            var entity = this.GetEntity(TransformUsageFlags.None);
             this.AddComponent(entity, new Timer { Time = new DiscreteTime(director.initialTime), TimeScale = 1 });
             this.AddComponent<TimerPaused>(entity);
             this.SetComponentEnabled<TimerPaused>(entity, false);

@@ -6,7 +6,15 @@
   "unityRelease": "0b5",
   "displayName": "BovineLabs Timeline",
   "dependencies": {
+    "com.bovinelabs.core": "1.2.6",
     "com.unity.entities": "1.2.0-pre.6",
-    "com.bovinelabs.core": "1.2.5"
-  }
+    "com.unity.timeline": "1.8.6"
+  },
+  "samples": [
+    {
+      "displayName": "Sample",
+      "description": "Simple sample including a sub director.",
+      "path": "Sample~"
+    }
+  ]
 }
