@@ -1,5 +1,5 @@
 # BovineLabs Timeline
-DOTS and burst compatible version of Unity Timeline.
+DOTS and burst compatible version of Unity Timeline. This is still a work in progress.
 
 Loosely based off the old official package from https://docs.unity3d.com/Packages/com.unity.timeline.dots@latest however it has been modernized, structural changes removed and the simulation logic changed in a variety of ways.
 
@@ -16,6 +16,6 @@ Loosely based off the old official package from https://docs.unity3d.com/Package
 
 # Future Work
 - Editor workflow
-- Less boilerplate for creating a new track system
+- Less boilerplate for creating new track systems
 - More built in tracks and clips
-- Prefab lifecycle
+- Prefab life cycle
