@@ -1,4 +1,4 @@
-﻿// <copyright file="RotationSystem.cs" company="BovineLabs">
+﻿// <copyright file="RotationTrackSystem.cs" company="BovineLabs">
 //     Copyright (c) BovineLabs. All rights reserved.
 // </copyright>
 
@@ -12,106 +12,55 @@ namespace BovineLabs.Timeline.Tracks
     using Unity.Burst;
     using Unity.Collections;
     using Unity.Entities;
-    using Unity.Jobs;
     using Unity.Mathematics;
     using Unity.Transforms;
 
     [UpdateInGroup(typeof(TimelineComponentAnimationGroup))]
     public partial struct RotationTrackSystem : ISystem
     {
-        private NativeParallelHashMap<Entity, MixData<quaternion>> blendResults;
+        private TrackBlendImpl<quaternion, BlobCurveSampler4<quaternion>, RotationAnimated> impl;
 
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            this.blendResults = new NativeParallelHashMap<Entity, MixData<quaternion>>(64, Allocator.Persistent);
+            this.impl.OnCreate(ref state);
         }
 
         [BurstCompile]
         public void OnDestroy(ref SystemState state)
         {
-            this.blendResults.Dispose();
+            this.impl.OnDestroy(ref state);
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            // TODO these could be parallel if we turned off safety
-            var dependency1 = new UpdateLookAtTargetJob
-                {
-                    LocalTransforms = SystemAPI.GetComponentLookup<LocalTransform>(true),
-                }
+            state.Dependency = new LookAtTargetClipJob { LocalTransforms = SystemAPI.GetComponentLookup<LocalTransform>(true) }
                 .ScheduleParallel(state.Dependency);
 
-            dependency1 = new LookAtStartingDirectionJob
-                {
-                    LocalTransforms = SystemAPI.GetComponentLookup<LocalTransform>(true),
-                }
-                .ScheduleParallel(dependency1);
+            state.Dependency = new LookAtStartingDirectionClipJob { LocalTransforms = SystemAPI.GetComponentLookup<LocalTransform>(true) }
+                .ScheduleParallel(state.Dependency);
 
-            var unblendedQuery = SystemAPI.QueryBuilder()
-                .WithAllRW<RotationAnimated>()
-                .WithAll<TrackBinding, LocalTime, TimelineActive>()
-                .WithNone<ClipWeight>()
-                .Build();
-
-            var blendedQuery = SystemAPI.QueryBuilder()
-                .WithAllRW<RotationAnimated>()
-                .WithAll<TrackBinding, LocalTime, TimelineActive, ClipWeight>()
-                .Build();
-
-            var dependency2 = new ResizeJob
-                {
-                    BlendData = this.blendResults,
-                    UnblendedCount = unblendedQuery.CalculateEntityCountWithoutFiltering(),
-                    BlendedCount = blendedQuery.CalculateEntityCountWithoutFiltering(),
-                }
-                .Schedule(state.Dependency);
-
-            state.Dependency = JobHandle.CombineDependencies(dependency1, dependency2);
-            state.Dependency = new AnimateUnblendedJob { BlendData = this.blendResults.AsParallelWriter() }.ScheduleParallel(unblendedQuery, state.Dependency);
-            state.Dependency = new AccumulateWeightedAnimationJob { BlendData = this.blendResults }.Schedule(blendedQuery, state.Dependency);
+            var blendData = this.impl.Update(ref state);
 
             state.Dependency = new WriteRotationJob
                 {
-                    BlendData = this.blendResults,
+                    BlendData = blendData,
                     LocalTransforms = SystemAPI.GetComponentLookup<LocalTransform>(),
                 }
-                .ScheduleParallel(this.blendResults, 64, state.Dependency);
-        }
-
-        [BurstCompile]
-        private struct ResizeJob : IJob
-        {
-            public NativeParallelHashMap<Entity, MixData<quaternion>> BlendData;
-
-            public int UnblendedCount;
-            public int BlendedCount;
-
-            public void Execute()
-            {
-                this.BlendData.Clear();
-                if (this.BlendData.Capacity < this.UnblendedCount + this.BlendedCount)
-                {
-                    this.BlendData.Capacity = this.UnblendedCount + this.BlendedCount;
-                }
-            }
+                .ScheduleParallel(blendData, 64, state.Dependency);
         }
 
         [WithAll(typeof(TimelineActive))]
-        private partial struct UpdateLookAtTargetJob : IJobEntity
+        private partial struct LookAtTargetClipJob : IJobEntity
         {
             [ReadOnly]
             public ComponentLookup<LocalTransform> LocalTransforms;
 
             private void Execute(ref RotationAnimated rotationAnimated, in TrackBinding trackBinding, in LookAtTarget lookAtTarget)
             {
-                if (!this.LocalTransforms.TryGetComponent(trackBinding.Value, out var bt))
-                {
-                    return;
-                }
-
-                if (!this.LocalTransforms.TryGetComponent(lookAtTarget.Target, out var lt))
+                if (!this.LocalTransforms.TryGetComponent(trackBinding.Value, out var bt) ||
+                    !this.LocalTransforms.TryGetComponent(lookAtTarget.Target, out var lt))
                 {
                     return;
                 }
@@ -123,7 +72,7 @@ namespace BovineLabs.Timeline.Tracks
         [WithAll(typeof(TimelineActive))]
         [WithNone(typeof(TimelineActivePrevious))] // we only update this once and cache it
         [WithAll(typeof(LookAtStartingDirection))]
-        private partial struct LookAtStartingDirectionJob : IJobEntity
+        private partial struct LookAtStartingDirectionClipJob : IJobEntity
         {
             [ReadOnly]
             public ComponentLookup<LocalTransform> LocalTransforms;
@@ -136,31 +85,6 @@ namespace BovineLabs.Timeline.Tracks
                 }
 
                 rotationAnimated.DefaultValue = bindingTransform.Rotation;
-            }
-        }
-
-        [WithAll(typeof(TimelineActive))]
-        [WithNone(typeof(ClipWeight))]
-        [BurstCompile]
-        private partial struct AnimateUnblendedJob : IJobEntity
-        {
-            public NativeParallelHashMap<Entity, MixData<quaternion>>.ParallelWriter BlendData;
-
-            private void Execute(ref RotationAnimated animated, in TrackBinding binding, in LocalTime localTime)
-            {
-                JobHelpers.AnimateUnblendExecuteGeneric<quaternion, BlobCurveSampler4<quaternion>, RotationAnimated>(binding, localTime, ref animated, this.BlendData);
-            }
-        }
-
-        [WithAll(typeof(TimelineActive))]
-        [BurstCompile]
-        private partial struct AccumulateWeightedAnimationJob : IJobEntity
-        {
-            public NativeParallelHashMap<Entity, MixData<quaternion>> BlendData;
-
-            private void Execute(ref RotationAnimated animated, in TrackBinding binding, in LocalTime localTime, in ClipWeight clip)
-            {
-                JobHelpers.AccumulateWeightedAnimationExecuteGeneric<quaternion, BlobCurveSampler4<quaternion>, RotationAnimated>(binding, localTime, ref animated, clip, this.BlendData);
             }
         }
 

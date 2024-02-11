@@ -101,30 +101,28 @@ namespace BovineLabs.Timeline
             blendData[binding.Value] = data;
         }
 
-        public static T Blend<T, TMixer>(ref MixData<T> values, in T defaultValue)
+        public static T Blend<T, TMixer>(ref MixData<T> values, in T defaultValue, TMixer mixer = default)
             where T : unmanaged
             where TMixer : unmanaged, IMixer<T>
         {
-            const float epsilon = 1e-6f;
-            T result = defaultValue;
+            var result = defaultValue;
 
-            var mixer = new TMixer();
-            if (values.Weights.x > epsilon)
+            if (values.Weights.x > math.EPSILON)
             {
                 var totalWeight = math.dot(values.Weights, new float4(1));
                 if (totalWeight < 1 && !values.Additive)
                 {
-                    if (values.Weights.y <= epsilon)
+                    if (values.Weights.y <= math.EPSILON)
                     {
                         values.Weights.y = 1 - totalWeight;
                         values.Value2 = defaultValue;
                     }
-                    else if (values.Weights.z <= epsilon)
+                    else if (values.Weights.z <= math.EPSILON)
                     {
                         values.Weights.z = 1 - totalWeight;
                         values.Value3 = defaultValue;
                     }
-                    else if (values.Weights.w <= epsilon)
+                    else if (values.Weights.w <= math.EPSILON)
                     {
                         values.Weights.w = 1 - totalWeight;
                         values.Value4 = defaultValue;
@@ -134,11 +132,11 @@ namespace BovineLabs.Timeline
                 }
 
                 var weights = values.Weights * math.rcp(totalWeight);
-                if (weights.y <= epsilon)
+                if (weights.y <= math.EPSILON)
                 {
                     result = values.Value1;
                 }
-                else if (weights.z <= epsilon)
+                else if (weights.z <= math.EPSILON)
                 {
                     result = mixer.Lerp(values.Value1, values.Value2, weights.y);
                 }
