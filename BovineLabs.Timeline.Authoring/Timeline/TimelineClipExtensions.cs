@@ -15,9 +15,7 @@ namespace BovineLabs.Timeline.Authoring
 
     public static class TimelineClipExtensions
     {
-        /// <summary>
-        /// Returns the start and end range for a TimelineClip as an ActiveRange
-        /// </summary>
+        /// <summary> Returns the start and end range for a TimelineClip as an ActiveRange. </summary>
         public static ActiveRange GetActiveRange(this TimelineClip clip)
         {
             var activeRange = new ActiveRange
@@ -29,11 +27,7 @@ namespace BovineLabs.Timeline.Authoring
             return activeRange;
         }
 
-        /// <summary>
-        /// Gets the parent to local time transform for a TimelineClip
-        /// </summary>
-        /// <param name="clip"></param>
-        /// <returns></returns>
+        /// <summary> Gets the parent to local time transform for a TimelineClip. </summary>
         public static TimeTransform GetTimeTransform(this TimelineClip clip)
         {
             return new TimeTransform
@@ -43,26 +37,6 @@ namespace BovineLabs.Timeline.Authoring
                 scale = clip.timeScale,
                 clipIn = new DiscreteTime(clip.clipIn),
             };
-        }
-
-        public static Hash128 GetMixCurveHash(this TimelineClip clip)
-        {
-            if (clip == null)
-            {
-                return default;
-            }
-
-            if (clip.mixInDuration < float.Epsilon && clip.mixOutDuration < float.Epsilon)
-            {
-                return default;
-            }
-
-            var A = clip.mixInDuration.GetHashCode();
-            var B = clip.mixInDuration > 0 ? clip.mixInCurve.GetHashCode() : 0;
-            var C = clip.mixOutDuration.GetHashCode();
-            var D = clip.mixOutDuration > 0 ? clip.mixOutCurve.GetHashCode() : 0;
-
-            return new Hash128 { Value = new uint4((uint)A, (uint)B, (uint)C, (uint)D) };
         }
 
         /// <summary>
@@ -193,27 +167,11 @@ namespace BovineLabs.Timeline.Authoring
         /// <summary>Returns the active range of the subtimeline of this clip</summary>
         public static ActiveRange GetSubTimelineRange(this TimelineClip clip)
         {
-            return new ActiveRange()
+            return new ActiveRange
             {
                 Start = new DiscreteTime(clip.ToLocalTimeUnbound(clip.extrapolatedStart)),
                 End = new DiscreteTime(clip.ToLocalTimeUnbound(clip.extrapolatedStart + clip.extrapolatedDuration)),
             };
-        }
-
-        /// <summary>Returns the extrapolated range of the timeline clip, clamped to the length of the timeline</summary>
-        public static double2 GetEffectiveRange(this TimelineClip clip)
-        {
-            var s = clip.extrapolatedStart;
-            var e = clip.extrapolatedStart + clip.extrapolatedDuration;
-
-            var parentTrack = clip.GetParentTrack();
-
-            if (parentTrack != null && parentTrack.timelineAsset != null)
-            {
-                e = math.min(e, parentTrack.timelineAsset.duration);
-            }
-
-            return new double2(s, e);
         }
     }
 }

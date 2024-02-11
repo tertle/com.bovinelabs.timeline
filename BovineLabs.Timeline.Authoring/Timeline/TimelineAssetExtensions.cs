@@ -26,7 +26,7 @@ namespace BovineLabs.Timeline.Authoring
         /// <summary> Get the active range of the timeline asset. </summary>
         public static ActiveRange GetRange(this TimelineAsset asset)
         {
-            return new ActiveRange()
+            return new ActiveRange
             {
                 Start = DiscreteTime.Zero,
                 End = new DiscreteTime(asset.duration),

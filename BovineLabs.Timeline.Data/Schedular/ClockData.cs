@@ -17,9 +17,7 @@ namespace BovineLabs.Timeline.Data.Schedular
     /// </summary>
     public struct ClockData : IComponentData
     {
-        /// <summary>
-        /// The delta time provided by the clock
-        /// </summary>
+        /// <summary> The delta time provided by the clock. </summary>
         public DiscreteTime DeltaTime;
 
         /// <summary>

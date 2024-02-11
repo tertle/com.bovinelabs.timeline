@@ -59,14 +59,5 @@ namespace BovineLabs.Timeline.Authoring
                 this.TrackBindings.SyncToTimeline(this.Timeline);
             }
         }
-
-        // public void GetTags(ICollection<Hash128> tags)
-        // {
-        //     foreach (var pairs in TrackBindings.Bindings)
-        //     {
-        //         if (pairs.Tag != null)
-        //             tags.Add(pairs.Tag.Tag);
-        //     }
-        // }
     }
 }

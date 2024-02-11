@@ -31,7 +31,6 @@ namespace BovineLabs.Timeline.Authoring
                     {
                         context.SharedContextValues.ClipEntities.Add((clipEntity, clip));
 
-                        dotsClip.Clip = clip;
                         dotsClip.Bake(clipEntity, clipContext);
                     }
                 }

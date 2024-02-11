@@ -24,9 +24,6 @@ namespace BovineLabs.Timeline.Authoring
             context.Baker.AddComponent(clipEntity, clip.GetActiveRange());
             context.Baker.AddComponent(clipEntity, new LocalTime { Value = DiscreteTime.Zero });
 
-            // var sourceAssetId = new SourceAssetInstanceId{ Value = clip.asset.GetInstanceID() };
-            // baker.AddComponent(clipEntity, sourceAssetId);
-
             if ((clip.clipCaps & ClipCaps.Blending) != 0)
             {
                 context.Baker.AddComponent(clipEntity, new ClipWeight { Value = 1 });

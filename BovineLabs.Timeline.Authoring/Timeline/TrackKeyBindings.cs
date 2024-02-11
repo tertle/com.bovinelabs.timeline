@@ -11,9 +11,7 @@ namespace BovineLabs.Timeline.Authoring
     using UnityEngine.Timeline;
     using Object = UnityEngine.Object;
 
-    /// <summary>
-    /// Serializable Track/Key Bindings
-    /// </summary>
+    /// <summary> Serializable Track/Target Bindings. </summary>
     [Serializable]
     public struct TrackKeyBindings
     {

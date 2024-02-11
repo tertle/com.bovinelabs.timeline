@@ -181,7 +181,5 @@ namespace BovineLabs.Timeline.Authoring
 
             track.BakeTrack(context, range);
         }
-
-
     }
 }
