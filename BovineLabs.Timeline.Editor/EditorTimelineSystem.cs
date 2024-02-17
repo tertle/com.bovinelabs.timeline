@@ -7,7 +7,6 @@ namespace BovineLabs.Timeline.Editor
     using BovineLabs.Timeline.Data;
     using BovineLabs.Timeline.Data.Schedular;
     using BovineLabs.Timeline.Schedular;
-    using Unity.Burst;
     using Unity.Collections;
     using Unity.Entities;
     using Unity.IntegerTime;
@@ -54,7 +53,10 @@ namespace BovineLabs.Timeline.Editor
 
             while (it.MoveNext())
             {
-                this.EntityManager.SetComponentEnabled<TimelineActive>(it.Current, false);
+                if (this.EntityManager.HasComponent<TimelineActive>(it.Current))
+                {
+                    this.EntityManager.SetComponentEnabled<TimelineActive>(it.Current, false);
+                }
             }
 
             this.toDisable.Clear();
