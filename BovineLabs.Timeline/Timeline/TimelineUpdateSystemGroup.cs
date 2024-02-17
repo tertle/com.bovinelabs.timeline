@@ -9,6 +9,7 @@ namespace BovineLabs.Timeline
 
     [UpdateAfter(typeof(ScheduleSystemGroup))]
     [UpdateInGroup(typeof(TimelineSystemGroup))]
+    [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor, WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor)]
     public partial class TimelineUpdateSystemGroup : ComponentSystemGroup
     {
     }

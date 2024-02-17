@@ -20,6 +20,8 @@ namespace BovineLabs.Timeline.Schedular
     /// Copies from ClockTypeXXX Component types to ClockData
     /// ClockData is used by the timer system to update timers
     /// </summary>
+    [WorldSystemFilter(WorldSystemFilterFlags.LocalSimulation | WorldSystemFilterFlags.Presentation)]
+    [UpdateBefore(typeof(TimerUpdateSystem))]
     [UpdateInGroup(typeof(ScheduleSystemGroup))]
     public partial struct ClockUpdateSystem : ISystem
     {

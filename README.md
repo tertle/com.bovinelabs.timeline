@@ -1,7 +1,7 @@
 # BovineLabs Timeline
 DOTS and burst compatible version of Unity Timeline. This is still a work in progress.
 
-Loosely based off the old official package from https://docs.unity3d.com/Packages/com.unity.timeline.dots@latest however it has been modernized, structural changes removed and the simulation logic changed in a variety of ways.
+Loosely based off the old official package from https://docs.unity3d.com/Packages/com.unity.timeline.dots@latest however it has been modernized, structural changes removed and much of the simulation logic changed.
 
 # Installation
 - BovineLabs Core: 1.2.6 and newer 

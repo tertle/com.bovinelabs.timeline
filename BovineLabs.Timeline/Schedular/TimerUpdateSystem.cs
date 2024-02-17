@@ -14,7 +14,6 @@ namespace BovineLabs.Timeline.Schedular
     using Unity.Entities;
     using Unity.IntegerTime;
 
-    [UpdateAfter(typeof(ClockUpdateSystem))]
     [UpdateInGroup(typeof(ScheduleSystemGroup))]
     public partial struct TimerUpdateSystem : ISystem
     {

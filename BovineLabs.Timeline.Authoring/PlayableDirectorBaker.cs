@@ -6,7 +6,6 @@ namespace BovineLabs.Timeline.Authoring
 {
     using System;
     using System.Collections.Generic;
-    using BovineLabs.Core.Authoring.EntityCommands;
     using BovineLabs.Timeline.Data;
     using BovineLabs.Timeline.Data.Schedular;
     using Unity.Entities;
@@ -26,7 +25,7 @@ namespace BovineLabs.Timeline.Authoring
             }
 
             var entity = this.GetEntity(TransformUsageFlags.None);
-            this.AddComponent(entity, new Timer { Time = new DiscreteTime(director.initialTime), TimeScale = 1 });
+            this.AddComponent(entity, new Timer { Time = new DiscreteTime(director.initialTime), TimeScale = 1 }); // TODO initial time isn't actually used
             this.AddComponent<TimerPaused>(entity);
             this.SetComponentEnabled<TimerPaused>(entity, false);
 

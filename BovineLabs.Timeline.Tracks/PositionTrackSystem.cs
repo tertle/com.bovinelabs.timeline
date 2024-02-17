@@ -14,24 +14,28 @@ namespace BovineLabs.Timeline.Tracks
     using Unity.Entities;
     using Unity.Mathematics;
     using Unity.Transforms;
+    using UnityEngine;
 
     [UpdateInGroup(typeof(TimelineComponentAnimationGroup))]
     public partial struct PositionTrackSystem : ISystem
     {
         private TrackBlendImpl<float3, BlobCurveSampler3, PositionAnimated> impl;
 
+        /// <inheritdoc/>
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             this.impl.OnCreate(ref state);
         }
 
+        /// <inheritdoc/>
         [BurstCompile]
         public void OnDestroy(ref SystemState state)
         {
             this.impl.OnDestroy(ref state);
         }
 
+        /// <inheritdoc/>
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {

@@ -6,6 +6,7 @@ namespace BovineLabs.Timeline
 {
     using Unity.Entities;
 
+    [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor, WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor)]
     public partial class TimelineSystemGroup : ComponentSystemGroup
     {
     }
