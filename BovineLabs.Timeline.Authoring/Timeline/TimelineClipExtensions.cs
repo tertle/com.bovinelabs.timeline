@@ -11,7 +11,6 @@ namespace BovineLabs.Timeline.Authoring
     using Unity.Mathematics;
     using UnityEngine;
     using UnityEngine.Timeline;
-    using Hash128 = Unity.Entities.Hash128;
 
     public static class TimelineClipExtensions
     {
