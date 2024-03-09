@@ -59,14 +59,14 @@ namespace BovineLabs.Timeline.Tracks
             [ReadOnly]
             public ComponentLookup<LocalTransform> LocalTransforms;
 
-            private void Execute(ref PositionAnimated rotationAnimated, in TrackBinding trackBinding)
+            private void Execute(ref PositionAnimated positionAnimated, in TrackBinding trackBinding)
             {
                 if (!this.LocalTransforms.TryGetComponent(trackBinding.Value, out var bindingTransform))
                 {
                     return;
                 }
 
-                rotationAnimated.DefaultValue = bindingTransform.Position;
+                positionAnimated.DefaultValue = bindingTransform.Position;
             }
         }
 
