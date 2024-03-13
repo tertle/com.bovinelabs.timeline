@@ -13,6 +13,7 @@ namespace BovineLabs.Timeline.Tracks
     using Unity.Collections;
     using Unity.Entities;
     using Unity.Mathematics;
+    using Unity.Physics;
     using Unity.Transforms;
 
     [UpdateInGroup(typeof(TimelineComponentAnimationGroup))]
@@ -91,6 +92,29 @@ namespace BovineLabs.Timeline.Tracks
 
                 lt.ValueRW.Position = JobHelpers.Blend<float3, Float3Mixer>(ref target, lt.ValueRO.Position);
             }
+        }
+
+        [BurstCompile]
+        [WithChangeFilter(typeof(TestEnableable))]
+        private partial struct TestJob : IJobEntity
+        {
+            public PhysicsWorld World;
+
+            private void Execute(in TestEnableable test, in LocalTransform lt, ref TestResult result)
+            {
+                var ray = new RaycastInput { Start = lt.Position, End = lt.Position + test.Displacement, Filter = CollisionFilter.Default };
+                result.Value = World.CastRay(ray, out _);
+            }
+        }
+
+        public struct TestEnableable : IComponentData, IEnableableComponent
+        {
+            public float3 Displacement;
+        }
+
+        public struct TestResult : IComponentData
+        {
+            public bool Value;
         }
     }
 }

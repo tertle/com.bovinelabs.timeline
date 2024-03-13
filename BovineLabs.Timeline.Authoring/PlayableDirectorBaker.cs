@@ -34,7 +34,7 @@ namespace BovineLabs.Timeline.Authoring
             switch (director.timeUpdateMode)
             {
                 case DirectorUpdateMode.DSPClock:
-                    this.AddComponent<ClockTypeRealTime>(entity);
+                    this.AddComponent<ClockTypeUnscaledGameTime>(entity);
                     Debug.LogWarning("DSP Clock mode not yet supported in DOTS. Using realtime clock instead");
                     break;
 

@@ -32,11 +32,9 @@ namespace BovineLabs.Timeline.Schedular
             var query = SystemAPI.QueryBuilder()
                 .WithAllRW<ClockData>()
                 .WithAll<TimelineActive>() // We don't check per entity but this is just used to early out entire chunks
-                .WithAny<ClockTypeConstant, ClockTypeGameTime, ClockTypeUnscaledGameTime, ClockTypeRealTime>()
+                .WithAny<ClockTypeConstant, ClockTypeGameTime, ClockTypeUnscaledGameTime>()
                 .WithOptions(EntityQueryOptions.FilterWriteGroup)
                 .Build();
-
-            var time = SystemAPI.GetSingleton<UnityTime>();
 
             state.Dependency = new ClockUpdateJob
                 {
@@ -45,12 +43,10 @@ namespace BovineLabs.Timeline.Schedular
                     ClockConstantType = SystemAPI.GetComponentTypeHandle<ClockTypeConstant>(true),
                     ClockGameTimeType = SystemAPI.GetComponentTypeHandle<ClockTypeGameTime>(true),
                     ClockUnscaledGameTimeType = SystemAPI.GetComponentTypeHandle<ClockTypeUnscaledGameTime>(true),
-                    ClockRealTimeType = SystemAPI.GetComponentTypeHandle<ClockTypeRealTime>(true),
 
-                    GameTimeScale = time.TimeScale,
+                    GameTimeScale = UnityEngine.Time.timeScale,
                     GameTimeDeltaTime = new DiscreteTime(SystemAPI.Time.DeltaTime),
-                    UnscaledGameTimeDeltaTime = new DiscreteTime(time.UnscaledDeltaTime),
-                    RealTimeDeltaTime = DiscreteTime.FromTicks(time.Ticks),
+                    UnscaledGameTimeDeltaTime = new DiscreteTime(UnityEngine.Time.unscaledDeltaTime),
                 }
                 .ScheduleParallel(query, state.Dependency);
         }
@@ -69,13 +65,9 @@ namespace BovineLabs.Timeline.Schedular
             [ReadOnly]
             public ComponentTypeHandle<ClockTypeUnscaledGameTime> ClockUnscaledGameTimeType;
 
-            [ReadOnly]
-            public ComponentTypeHandle<ClockTypeRealTime> ClockRealTimeType;
-
             public DiscreteTime GameTimeDeltaTime;
             public double GameTimeScale;
             public DiscreteTime UnscaledGameTimeDeltaTime;
-            public DiscreteTime RealTimeDeltaTime;
 
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
@@ -97,16 +89,6 @@ namespace BovineLabs.Timeline.Schedular
                     var write = new ClockData
                     {
                         DeltaTime = this.UnscaledGameTimeDeltaTime,
-                        Scale = 1,
-                    };
-
-                    UnsafeUtility.MemCpyReplicate(clockData, &write, sizeof(ClockData), chunk.Count);
-                }
-                else if (chunk.Has(ref this.ClockRealTimeType))
-                {
-                    var write = new ClockData
-                    {
-                        DeltaTime = this.RealTimeDeltaTime,
                         Scale = 1,
                     };
 
