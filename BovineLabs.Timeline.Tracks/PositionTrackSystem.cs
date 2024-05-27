@@ -13,8 +13,8 @@ namespace BovineLabs.Timeline.Tracks
     using Unity.Collections;
     using Unity.Entities;
     using Unity.Mathematics;
-    using Unity.Physics;
     using Unity.Transforms;
+    using UnityEngine;
 
     [UpdateInGroup(typeof(TimelineComponentAnimationGroup))]
     public partial struct PositionTrackSystem : ISystem
@@ -39,17 +39,53 @@ namespace BovineLabs.Timeline.Tracks
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            state.Dependency = new MoveToStartingPositionClipJob { LocalTransforms = SystemAPI.GetComponentLookup<LocalTransform>(true) }
-                .ScheduleParallel(state.Dependency);
+            var localTransforms = SystemAPI.GetComponentLookup<LocalTransform>();
+
+            new ActivateResetJob { LocalTransforms = localTransforms }.ScheduleParallel();
+            new DeactivateResetJob { LocalTransforms = localTransforms }.Schedule();
+
+            new MoveToStartingPositionClipJob { LocalTransforms = localTransforms }.ScheduleParallel();
 
             var blendData = this.impl.Update(ref state);
 
-            state.Dependency = new WritePositionJob
-                {
-                    BlendData = blendData,
-                    LocalTransforms = SystemAPI.GetComponentLookup<LocalTransform>(),
-                }
+            state.Dependency = new WritePositionJob { BlendData = blendData, LocalTransforms = localTransforms }
                 .ScheduleParallel(blendData, 64, state.Dependency);
+        }
+
+        [WithAll(typeof(TimelineActive))]
+        [WithNone(typeof(TimelineActivePrevious))]
+        private partial struct ActivateResetJob : IJobEntity
+        {
+            [ReadOnly]
+            public ComponentLookup<LocalTransform> LocalTransforms;
+
+            private void Execute(ref PositionResetOnDeactivate positionResetOnDeactivate, in TrackBinding trackBinding)
+            {
+                if (!this.LocalTransforms.TryGetComponent(trackBinding.Value, out var bindingTransform))
+                {
+                    return;
+                }
+
+                positionResetOnDeactivate.Value = bindingTransform.Position;
+            }
+        }
+
+        [WithNone(typeof(TimelineActive))]
+        [WithAll(typeof(TimelineActivePrevious))]
+        private partial struct DeactivateResetJob : IJobEntity
+        {
+            public ComponentLookup<LocalTransform> LocalTransforms;
+
+            private void Execute(in PositionResetOnDeactivate positionResetOnDeactivate, in TrackBinding trackBinding)
+            {
+                var localTransform = this.LocalTransforms.GetRefRWOptional(trackBinding.Value);
+                if (!localTransform.IsValid)
+                {
+                    return;
+                }
+
+                localTransform.ValueRW.Position = positionResetOnDeactivate.Value;
+            }
         }
 
         [WithAll(typeof(TimelineActive))]
@@ -92,29 +128,6 @@ namespace BovineLabs.Timeline.Tracks
 
                 lt.ValueRW.Position = JobHelpers.Blend<float3, Float3Mixer>(ref target, lt.ValueRO.Position);
             }
-        }
-
-        [BurstCompile]
-        [WithChangeFilter(typeof(TestEnableable))]
-        private partial struct TestJob : IJobEntity
-        {
-            public PhysicsWorld World;
-
-            private void Execute(in TestEnableable test, in LocalTransform lt, ref TestResult result)
-            {
-                var ray = new RaycastInput { Start = lt.Position, End = lt.Position + test.Displacement, Filter = CollisionFilter.Default };
-                result.Value = World.CastRay(ray, out _);
-            }
-        }
-
-        public struct TestEnableable : IComponentData, IEnableableComponent
-        {
-            public float3 Displacement;
-        }
-
-        public struct TestResult : IComponentData
-        {
-            public bool Value;
         }
     }
 }

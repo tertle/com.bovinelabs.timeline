@@ -4,6 +4,7 @@
 
 namespace BovineLabs.Timeline.Authoring
 {
+    using BovineLabs.Timeline.Tracks.Data;
     using UnityEngine;
     using UnityEngine.Timeline;
 
@@ -13,5 +14,15 @@ namespace BovineLabs.Timeline.Authoring
     [TrackBindingType(typeof(Transform))]
     public class PositionTrack : DOTSTrack
     {
+        public bool ResetPositionOnDeactivate;
+
+        protected override void Bake(BakingContext context)
+        {
+            if (this.ResetPositionOnDeactivate)
+            {
+                var trackEntity = context.CreateTrackEntity();
+                context.Baker.AddComponent<PositionResetOnDeactivate>(trackEntity);
+            }
+        }
     }
 }

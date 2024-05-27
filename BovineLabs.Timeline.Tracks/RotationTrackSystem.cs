@@ -35,20 +35,57 @@ namespace BovineLabs.Timeline.Tracks
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            state.Dependency = new LookAtTargetClipJob { LocalTransforms = SystemAPI.GetComponentLookup<LocalTransform>(true) }
+            var localTransforms = SystemAPI.GetComponentLookup<LocalTransform>();
+
+            new ActivateResetJob { LocalTransforms = localTransforms }.ScheduleParallel();
+            new DeactivateResetJob { LocalTransforms = localTransforms }.Schedule();
+
+            state.Dependency = new LookAtTargetClipJob { LocalTransforms = localTransforms }
                 .ScheduleParallel(state.Dependency);
 
-            state.Dependency = new LookAtStartingDirectionClipJob { LocalTransforms = SystemAPI.GetComponentLookup<LocalTransform>(true) }
+            state.Dependency = new LookAtStartingDirectionClipJob { LocalTransforms = localTransforms }
                 .ScheduleParallel(state.Dependency);
 
             var blendData = this.impl.Update(ref state);
 
-            state.Dependency = new WriteRotationJob
-                {
-                    BlendData = blendData,
-                    LocalTransforms = SystemAPI.GetComponentLookup<LocalTransform>(),
-                }
+            state.Dependency = new WriteRotationJob { BlendData = blendData, LocalTransforms = localTransforms }
                 .ScheduleParallel(blendData, 64, state.Dependency);
+        }
+
+        [WithAll(typeof(TimelineActive))]
+        [WithNone(typeof(TimelineActivePrevious))]
+        private partial struct ActivateResetJob : IJobEntity
+        {
+            [ReadOnly]
+            public ComponentLookup<LocalTransform> LocalTransforms;
+
+            private void Execute(ref RotationResetOnDeactivate rotationResetOnDeactivate, in TrackBinding trackBinding)
+            {
+                if (!this.LocalTransforms.TryGetComponent(trackBinding.Value, out var bindingTransform))
+                {
+                    return;
+                }
+
+                rotationResetOnDeactivate.Value = bindingTransform.Rotation;
+            }
+        }
+
+        [WithNone(typeof(TimelineActive))]
+        [WithAll(typeof(TimelineActivePrevious))]
+        private partial struct DeactivateResetJob : IJobEntity
+        {
+            public ComponentLookup<LocalTransform> LocalTransforms;
+
+            private void Execute(in RotationResetOnDeactivate rotationResetOnDeactivate, in TrackBinding trackBinding)
+            {
+                var localTransform = this.LocalTransforms.GetRefRWOptional(trackBinding.Value);
+                if (!localTransform.IsValid)
+                {
+                    return;
+                }
+
+                localTransform.ValueRW.Rotation = rotationResetOnDeactivate.Value;
+            }
         }
 
         [WithAll(typeof(TimelineActive))]

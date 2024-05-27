@@ -41,7 +41,7 @@ namespace BovineLabs.Timeline.Authoring
             context.SharedContextValues.CompositeTimers.Clear(); // TODO is this right?
         }
 
-        public virtual void Bake(BakingContext context)
+        protected virtual void Bake(BakingContext context)
         {
             // if (context.Binding != null)
             // {
