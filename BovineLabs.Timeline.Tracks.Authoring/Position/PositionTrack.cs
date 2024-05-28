@@ -8,11 +8,11 @@ namespace BovineLabs.Timeline.Authoring
     using UnityEngine;
     using UnityEngine.Timeline;
 
-    [TrackClipType(typeof(MoveToStartingPositionClip))]
-    [TrackClipType(typeof(MovePositionClip))]
+    [TrackClipType(typeof(PositionStartClip))]
+    [TrackClipType(typeof(PositionClip))]
     [TrackColor(0.25f, 0.25f, 0)]
     [TrackBindingType(typeof(Transform))]
-    public class PositionTrack : DOTSTrack
+    public class TransformPositionTrack : DOTSTrack
     {
         public bool ResetPositionOnDeactivate;
 

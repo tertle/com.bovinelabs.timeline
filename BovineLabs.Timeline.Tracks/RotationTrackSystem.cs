@@ -94,10 +94,10 @@ namespace BovineLabs.Timeline.Tracks
             [ReadOnly]
             public ComponentLookup<LocalTransform> LocalTransforms;
 
-            private void Execute(ref RotationAnimated rotationAnimated, in TrackBinding trackBinding, in LookAtTarget lookAtTarget)
+            private void Execute(ref RotationAnimated rotationAnimated, in TrackBinding trackBinding, in RotationLookAtTarget rotationLookAtTarget)
             {
                 if (!this.LocalTransforms.TryGetComponent(trackBinding.Value, out var bt) ||
-                    !this.LocalTransforms.TryGetComponent(lookAtTarget.Target, out var lt))
+                    !this.LocalTransforms.TryGetComponent(rotationLookAtTarget.Target, out var lt))
                 {
                     return;
                 }
@@ -108,7 +108,7 @@ namespace BovineLabs.Timeline.Tracks
 
         [WithAll(typeof(TimelineActive))]
         [WithNone(typeof(TimelineActivePrevious))] // we only update this once and cache it
-        [WithAll(typeof(LookAtStartingDirection))]
+        [WithAll(typeof(RotationLookAtStart))]
         private partial struct LookAtStartingDirectionClipJob : IJobEntity
         {
             [ReadOnly]

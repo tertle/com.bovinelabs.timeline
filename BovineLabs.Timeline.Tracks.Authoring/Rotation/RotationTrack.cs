@@ -8,11 +8,11 @@ namespace BovineLabs.Timeline.Authoring
     using UnityEngine;
     using UnityEngine.Timeline;
 
-    [TrackClipType(typeof(LookAtTargetClip))]
-    [TrackClipType(typeof(LookAtStartingDirectionClip))]
+    [TrackClipType(typeof(RotationLookAtTargetClip))]
+    [TrackClipType(typeof(RotationLookAtStartClip))]
     [TrackColor(0, 0.25f, 0)]
     [TrackBindingType(typeof(Transform))]
-    public class RotationTrack : DOTSTrack
+    public class TransformRotationTrack : DOTSTrack
     {
         public bool ResetRotationOnDeactivate;
 

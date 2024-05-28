@@ -1,4 +1,4 @@
-﻿// <copyright file="LookAtTargetClip.cs" company="BovineLabs">
+﻿// <copyright file="RotationLookAtTargetClip.cs" company="BovineLabs">
 //     Copyright (c) BovineLabs. All rights reserved.
 // </copyright>
 
@@ -9,7 +9,7 @@ namespace BovineLabs.Timeline.Authoring
     using UnityEngine;
     using UnityEngine.Timeline;
 
-    public class LookAtTargetClip : DOTSClip, ITimelineClipAsset
+    public class RotationLookAtTargetClip : DOTSClip, ITimelineClipAsset
     {
         public ExposedReference<Transform> Target;
 
@@ -25,7 +25,7 @@ namespace BovineLabs.Timeline.Authoring
                 target = context.Director.GetReferenceValue(this.Target.exposedName, out _) as Transform;
             }
 
-            context.Baker.AddComponent(clipEntity, new LookAtTarget
+            context.Baker.AddComponent(clipEntity, new RotationLookAtTarget
             {
                 Target = context.Baker.GetEntity(target, TransformUsageFlags.Dynamic),
             });

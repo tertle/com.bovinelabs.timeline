@@ -6,7 +6,7 @@ namespace BovineLabs.Timeline.Tracks.Data
 {
     using Unity.Entities;
 
-    public struct MoveToStartingPosition : IComponentData
+    public struct PositionMoveToStart : IComponentData
     {
     }
 }

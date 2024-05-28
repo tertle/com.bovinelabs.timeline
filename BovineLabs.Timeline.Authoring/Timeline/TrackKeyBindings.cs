@@ -29,36 +29,35 @@ namespace BovineLabs.Timeline.Authoring
         /// <summary>Sync the track list to the given Timeline</summary>
         public void SyncToTimeline(TimelineAsset timeline)
         {
-            if (this.Bindings == null)
+            this.Bindings ??= new List<TrackKeyPair>();
+
+            if (timeline == null)
             {
-                this.Bindings = new List<TrackKeyPair>();
+                return;
             }
 
-            if (timeline != null)
+            var list = this.Bindings;
+
+            var outputs = timeline.outputs.ToList();
+            foreach (var output in outputs)
             {
-                var list = this.Bindings;
-
-                var outputs = timeline.outputs.ToList();
-                foreach (PlayableBinding output in outputs)
+                var track = output.sourceObject as TrackAsset;
+                if (output.outputTargetType == null || track == null)
                 {
-                    var track = output.sourceObject as TrackAsset;
-                    if (output.outputTargetType == null || track == null)
-                    {
-                        continue;
-                    }
-
-                    if (list.FindIndex(x => x.Track == track) == -1)
-                    {
-                        list.Add(new TrackKeyPair() { Track = track } );
-                    }
+                    continue;
                 }
 
-                for (int i = list.Count-1; i >= 0; i--)
+                if (list.FindIndex(x => x.Track == track) == -1)
                 {
-                    if (list[i].Track == null || outputs.FindIndex(o => o.sourceObject == list[i].Track) == -1)
-                    {
-                        list.RemoveAt(i);
-                    }
+                    list.Add(new TrackKeyPair { Track = track } );
+                }
+            }
+
+            for (int i = list.Count-1; i >= 0; i--)
+            {
+                if (list[i].Track == null || outputs.FindIndex(o => o.sourceObject == list[i].Track) == -1)
+                {
+                    list.RemoveAt(i);
                 }
             }
         }

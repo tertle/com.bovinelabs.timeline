@@ -4,6 +4,7 @@
 
 namespace BovineLabs.Timeline.Tracks
 {
+    using System;
     using BovineLabs.Core.Collections;
     using BovineLabs.Core.Jobs;
     using BovineLabs.Timeline;
@@ -41,9 +42,11 @@ namespace BovineLabs.Timeline.Tracks
         {
             var localTransforms = SystemAPI.GetComponentLookup<LocalTransform>();
 
+            // TODO all these could be run in parallel
             new ActivateResetJob { LocalTransforms = localTransforms }.ScheduleParallel();
             new DeactivateResetJob { LocalTransforms = localTransforms }.Schedule();
-
+            new PositionOffsetJob { LocalTransforms = localTransforms }.ScheduleParallel();
+            new PositionTargetJob { LocalTransforms = localTransforms }.ScheduleParallel();
             new MoveToStartingPositionClipJob { LocalTransforms = localTransforms }.ScheduleParallel();
 
             var blendData = this.impl.Update(ref state);
@@ -90,7 +93,56 @@ namespace BovineLabs.Timeline.Tracks
 
         [WithAll(typeof(TimelineActive))]
         [WithNone(typeof(TimelineActivePrevious))] // we only update this once and cache it
-        [WithAll(typeof(MoveToStartingPosition))]
+        private partial struct PositionOffsetJob : IJobEntity
+        {
+            [ReadOnly]
+            public ComponentLookup<LocalTransform> LocalTransforms;
+
+            private void Execute(ref PositionAnimated positionAnimated, in PositionOffset positionOffset, in TrackBinding trackBinding)
+            {
+                if (!this.LocalTransforms.TryGetComponent(trackBinding.Value, out var bindingTransform))
+                {
+                    return;
+                }
+
+                var offset = positionOffset.Type switch
+                {
+                    OffsetType.World => positionOffset.Offset,
+                    OffsetType.Local => bindingTransform.TransformPoint(positionOffset.Offset),
+                    _ => float3.zero,
+                };
+
+                positionAnimated.DefaultValue = bindingTransform.Position + offset;
+            }
+        }
+
+        [WithAll(typeof(TimelineActive))]
+        private partial struct PositionTargetJob : IJobEntity
+        {
+            [ReadOnly]
+            public ComponentLookup<LocalTransform> LocalTransforms;
+
+            private void Execute(ref PositionAnimated positionAnimated, in PositionTarget positionTarget)
+            {
+                if (!this.LocalTransforms.TryGetComponent(positionTarget.Target, out var targetTransform))
+                {
+                    return;
+                }
+
+                var offset = positionTarget.Type switch
+                {
+                    OffsetType.World => positionTarget.Offset,
+                    OffsetType.Local => targetTransform.TransformPoint(positionTarget.Offset),
+                    _ => float3.zero,
+                };
+
+                positionAnimated.DefaultValue = targetTransform.Position + offset;
+            }
+        }
+
+        [WithAll(typeof(TimelineActive))]
+        [WithNone(typeof(TimelineActivePrevious))] // we only update this once and cache it
+        [WithAll(typeof(PositionMoveToStart))]
         private partial struct MoveToStartingPositionClipJob : IJobEntity
         {
             [ReadOnly]

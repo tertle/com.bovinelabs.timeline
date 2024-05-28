@@ -6,7 +6,7 @@ namespace BovineLabs.Timeline.Tracks.Data
 {
     using Unity.Entities;
 
-    public struct LookAtStartingDirection : IComponentData
+    public struct RotationLookAtStart : IComponentData
     {
     }
 }
