@@ -2,7 +2,7 @@
 //     Copyright (c) BovineLabs. All rights reserved.
 // </copyright>
 
-namespace BovineLabs.Timeline.Data
+namespace BovineLabs.Timeline
 {
     using Unity.Entities;
 
