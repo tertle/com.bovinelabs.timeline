@@ -4,14 +4,18 @@
 
 namespace BovineLabs.Timeline.Authoring
 {
+    using System;
+    using System.ComponentModel;
     using BovineLabs.Timeline.Tracks.Data;
     using UnityEngine;
     using UnityEngine.Timeline;
 
+    [Serializable]
     [TrackClipType(typeof(PositionStartClip))]
     [TrackClipType(typeof(PositionClip))]
     [TrackColor(0.25f, 0.25f, 0)]
     [TrackBindingType(typeof(Transform))]
+    [DisplayName("DOTS/Transform Position Track")]
     public class TransformPositionTrack : DOTSTrack
     {
         public bool ResetPositionOnDeactivate;

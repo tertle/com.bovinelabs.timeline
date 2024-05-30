@@ -4,7 +4,6 @@
 
 namespace BovineLabs.Timeline.Tracks
 {
-    using System;
     using BovineLabs.Core.Collections;
     using BovineLabs.Core.Jobs;
     using BovineLabs.Timeline;
@@ -15,7 +14,6 @@ namespace BovineLabs.Timeline.Tracks
     using Unity.Entities;
     using Unity.Mathematics;
     using Unity.Transforms;
-    using UnityEngine;
 
     [UpdateInGroup(typeof(TimelineComponentAnimationGroup))]
     public partial struct PositionTrackSystem : ISystem
@@ -163,7 +161,7 @@ namespace BovineLabs.Timeline.Tracks
         private struct WritePositionJob : IJobParallelHashMapDefer
         {
             [ReadOnly]
-            public NativeParallelHashMap<Entity, MixData<float3>> BlendData;
+            public NativeParallelHashMap<Entity, MixData<float3>>.ReadOnly BlendData;
 
             [NativeDisableParallelForRestriction]
             public ComponentLookup<LocalTransform> LocalTransforms;

@@ -65,7 +65,7 @@ namespace BovineLabs.Timeline
         /// <param name="animateUnblendedJob"> Ignore animateUnblendedJob. </param>
         /// <param name="accumulateWeightedAnimationJob"> Ignore accumulateWeightedAnimationJob. </param>
         /// <returns> The hashmap of the blended results. See samples on how to use this to write results. </returns>
-        public NativeParallelHashMap<Entity, MixData<T>> Update(
+        public NativeParallelHashMap<Entity, MixData<T>>.ReadOnly Update(
             ref SystemState state,
             ResizeJob resizeJob = default,
             AnimateUnblendedJob animateUnblendedJob = default,
@@ -95,7 +95,7 @@ namespace BovineLabs.Timeline
             state.Dependency = animateUnblendedJob.ScheduleParallel(this.unblendedQuery, state.Dependency);
             state.Dependency = accumulateWeightedAnimationJob.Schedule(this.blendedQuery, state.Dependency);
 
-            return this.blendResults;
+            return this.blendResults.AsReadOnly();
         }
 
         [BurstCompile]

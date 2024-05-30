@@ -129,7 +129,7 @@ namespace BovineLabs.Timeline.Tracks
         private struct WriteRotationJob : IJobParallelHashMapDefer
         {
             [ReadOnly]
-            public NativeParallelHashMap<Entity, MixData<quaternion>> BlendData;
+            public NativeParallelHashMap<Entity, MixData<quaternion>>.ReadOnly BlendData;
 
             [NativeDisableParallelForRestriction]
             public ComponentLookup<LocalTransform> LocalTransforms;

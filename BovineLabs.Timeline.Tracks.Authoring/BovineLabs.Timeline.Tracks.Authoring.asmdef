@@ -30,6 +30,12 @@
     "defineConstraints": [
         "UNITY_EDITOR"
     ],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.rukhanka.animation",
+            "expression": "",
+            "define": "RUKHANKA_ANIMATION"
+        }
+    ],
     "noEngineReferences": false
 }
