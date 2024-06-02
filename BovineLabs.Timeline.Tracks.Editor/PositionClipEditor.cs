@@ -59,24 +59,24 @@ namespace BovineLabs.Timeline.Tracks.Editor
 
         private void SetVisibility(SerializedProperty property)
         {
-            SetVisible(this.positionField, false);
-            SetVisible(this.offsetTypeField, false);
-            SetVisible(this.offsetField, false);
-            SetVisible(this.targetField, false);
+            ElementUtility.SetVisible(this.positionField, false);
+            ElementUtility.SetVisible(this.offsetTypeField, false);
+            ElementUtility.SetVisible(this.offsetField, false);
+            ElementUtility.SetVisible(this.targetField, false);
 
             switch ((PositionType)property.enumValueIndex)
             {
                 case PositionType.World:
-                    SetVisible(this.positionField, true);
+                    ElementUtility.SetVisible(this.positionField, true);
                     break;
                 case PositionType.Offset:
-                    SetVisible(this.offsetTypeField, true);
-                    SetVisible(this.offsetField, true);
+                    ElementUtility.SetVisible(this.offsetTypeField, true);
+                    ElementUtility.SetVisible(this.offsetField, true);
                     break;
                 case PositionType.Target:
-                    SetVisible(this.offsetTypeField, true);
-                    SetVisible(this.offsetField, true);
-                    SetVisible(this.targetField, true);
+                    ElementUtility.SetVisible(this.offsetTypeField, true);
+                    ElementUtility.SetVisible(this.offsetField, true);
+                    ElementUtility.SetVisible(this.targetField, true);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
