@@ -53,6 +53,7 @@ namespace BovineLabs.Timeline.Tracks
                 .ScheduleParallel(blendData, 64, state.Dependency);
         }
 
+        [BurstCompile]
         [WithAll(typeof(TimelineActive))]
         [WithNone(typeof(TimelineActivePrevious))]
         private partial struct ActivateResetJob : IJobEntity
@@ -71,6 +72,7 @@ namespace BovineLabs.Timeline.Tracks
             }
         }
 
+        [BurstCompile]
         [WithNone(typeof(TimelineActive))]
         [WithAll(typeof(TimelineActivePrevious))]
         private partial struct DeactivateResetJob : IJobEntity
@@ -89,6 +91,7 @@ namespace BovineLabs.Timeline.Tracks
             }
         }
 
+        [BurstCompile]
         [WithAll(typeof(TimelineActive))]
         [WithNone(typeof(TimelineActivePrevious))] // we only update this once and cache it
         private partial struct PositionOffsetJob : IJobEntity
@@ -114,6 +117,7 @@ namespace BovineLabs.Timeline.Tracks
             }
         }
 
+        [BurstCompile]
         [WithAll(typeof(TimelineActive))]
         private partial struct PositionTargetJob : IJobEntity
         {
@@ -138,6 +142,7 @@ namespace BovineLabs.Timeline.Tracks
             }
         }
 
+        [BurstCompile]
         [WithAll(typeof(TimelineActive))]
         [WithNone(typeof(TimelineActivePrevious))] // we only update this once and cache it
         [WithAll(typeof(PositionMoveToStart))]
