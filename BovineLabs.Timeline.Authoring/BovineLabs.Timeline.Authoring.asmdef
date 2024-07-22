@@ -17,7 +17,9 @@
         "Unity.Mathematics",
         "Unity.Physics",
         "Unity.Timeline",
-        "Unity.Transforms"
+        "Unity.Transforms",
+        "BovineLabs.Reaction.Authoring",
+        "BovineLabs.Reaction.Data"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -28,6 +30,12 @@
     "defineConstraints": [
         "UNITY_EDITOR"
     ],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.bovinelabs.reaction",
+            "expression": "",
+            "define": "BL_REACTION"
+        }
+    ],
     "noEngineReferences": false
 }

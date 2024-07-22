@@ -95,12 +95,12 @@ namespace BovineLabs.Timeline.Authoring
             ConvertPlayableDirector(context, ActiveRange.CompleteRange);
 
             var binders = this.AddBuffer<DirectorBinding>(entity);
-            foreach (var b in context.SharedContextValues.BindingToClip)
+            foreach (var binding in context.SharedContextValues.BindingToClip)
             {
                 binders.Add(new DirectorBinding
                 {
-                    TrackName = b.TrackName,
-                    Binder = b.Binder,
+                    TrackIdentifier = TimelineBakingUtility.TrackToIdentifier(binding.Binding.Track),
+                    TrackEntity = binding.Binder,
                 });
             }
         }

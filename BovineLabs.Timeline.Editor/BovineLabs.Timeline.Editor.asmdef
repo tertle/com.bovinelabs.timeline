@@ -7,6 +7,7 @@
         "BovineLabs.Core.Extensions",
         "BovineLabs.Core.Extensions.Editor",
         "BovineLabs.Timeline",
+        "BovineLabs.Timeline.Authoring",
         "BovineLabs.Timeline.Data",
         "Unity.Burst",
         "Unity.Collections",
@@ -18,6 +19,7 @@
         "Unity.Mathematics",
         "Unity.Physics",
         "Unity.Transforms",
+        "Unity.Timeline",
         "Unity.Timeline.Editor"
     ],
     "includePlatforms": [
@@ -29,6 +31,12 @@
     "precompiledReferences": [],
     "autoReferenced": false,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.bovinelabs.reaction",
+            "expression": "",
+            "define": "BL_REACTION"
+        }
+    ],
     "noEngineReferences": false
 }

@@ -19,7 +19,7 @@ namespace BovineLabs.Timeline.Authoring
     public struct BakingContext
     {
         /// <summary>The Conversion System</summary>
-        public IBaker Baker;
+        public readonly IBaker Baker;
 
         /// <summary>The current timer entity for this conversion</summary>
         public Entity Timer;
@@ -58,12 +58,12 @@ namespace BovineLabs.Timeline.Authoring
 
     public class Binding
     {
-        public readonly string Name;
+        public readonly DOTSTrack Track;
         public readonly Entity Target;
 
-        public Binding(string name, Entity target)
+        public Binding(DOTSTrack track, Entity target)
         {
-            this.Name = name;
+            this.Track = track;
             this.Target = target;
         }
     }
@@ -79,7 +79,7 @@ namespace BovineLabs.Timeline.Authoring
         public readonly Dictionary<Entity, CompositeTimer> CompositeTimers = new();
         public readonly List<Entity> TimeDataEntities = new();
         public readonly List<Entity> CompositeLinkEntities = new();
-        public readonly List<(string TrackName, Entity Binder)> BindingToClip = new();
+        public readonly List<(Binding Binding, Entity Binder)> BindingToClip = new();
     }
 
     /// <summary>
@@ -195,7 +195,7 @@ namespace BovineLabs.Timeline.Authoring
             context.AddActive(linked);
 
             context.Baker.AddComponent(linked, new TrackBinding { Value = context.Binding.Target });
-            context.SharedContextValues.BindingToClip.Add((context.Binding.Name, linked));
+            context.SharedContextValues.BindingToClip.Add((context.Binding, linked));
             // context.Baker.AddComponent(linked, new ActiveRange
             // {
             //     Start = DiscreteTime.MinValue,
@@ -226,7 +226,7 @@ namespace BovineLabs.Timeline.Authoring
             if (context.Binding != null)
             {
                 context.Baker.AddComponent(entity, new TrackBinding { Value = context.Binding.Target });
-                context.SharedContextValues.BindingToClip.Add((context.Binding.Name, entity));
+                context.SharedContextValues.BindingToClip.Add((context.Binding, entity));
             }
 
             return entity;
@@ -246,7 +246,7 @@ namespace BovineLabs.Timeline.Authoring
                 };
             }
 
-            return new Binding(track.name, entity);
+            return new Binding(track, entity);
         }
 
         public static void AddActive(this BakingContext context, Entity entity)

@@ -14,7 +14,8 @@
         "Unity.Logging",
         "Unity.Mathematics",
         "Unity.Physics",
-        "Unity.Transforms"
+        "Unity.Transforms",
+        "BovineLabs.Reaction.Data"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -23,6 +24,12 @@
     "precompiledReferences": [],
     "autoReferenced": false,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.bovinelabs.reaction",
+            "expression": "",
+            "define": "BL_REACTION"
+        }
+    ],
     "noEngineReferences": false
 }

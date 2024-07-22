@@ -19,6 +19,8 @@ namespace BovineLabs.Timeline.Authoring
          /// Creates an entity from this clip, using the context object provided. Override this method to change the default
          /// clip create method, or return Entity.Null where a conversion is not required.
          /// </summary>
+        /// <param name="context"> The current context. </param>
+        /// <returns> The clip entity or Entity.Null when baking not required. </returns>
          public virtual Entity CreateClipEntity(BakingContext context)
          {
              return context.CreateClipEntity();
