@@ -19,8 +19,13 @@
   "samples": [
     {
       "displayName": "Sample",
-      "description": "Simple sample including a sub director.",
+      "description": "Simple sample including a sub director. This includes the Tracks sample.",
       "path": "Sample~"
+    },
+    {
+      "displayName": "Tracks",
+      "description": "Example tracks for Position and Rotation",
+      "path": "Tracks~"
     }
   ]
 }
