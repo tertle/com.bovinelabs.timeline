@@ -5,7 +5,6 @@
 namespace BovineLabs.Timeline.Schedular
 {
     using BovineLabs.Core.Assertions;
-    using BovineLabs.Core.Time;
     using BovineLabs.Timeline.Data;
     using BovineLabs.Timeline.Data.Schedular;
     using Unity.Burst;
