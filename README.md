@@ -6,7 +6,6 @@ Loosely based off the old official package from https://docs.unity3d.com/Package
 # Installation
 - BovineLabs Core: 1.2.7 and newer 
   - Available https://gitlab.com/tertle/com.bovinelabs.core or via OpenUPM https://openupm.com/packages/com.bovinelabs.core/
-  - Requires the Time feature to be enabled 
 
 # Sample
 - A sample is included via package manager
