@@ -21,7 +21,7 @@ namespace BovineLabs.Timeline
             where TB : unmanaged, IBlobCurveSampler<T>
             where TC : unmanaged, IAnimatedComponent<T, TB>
         {
-            if ((float)localTime.Value < 0)
+            if (!localTime.IsActive)
             {
                 return;
             }
@@ -51,7 +51,7 @@ namespace BovineLabs.Timeline
             where TB : unmanaged, IBlobCurveSampler<T>
             where TC : unmanaged, IAnimatedComponent<T, TB>
         {
-            if ((float)localTime.Value < 0)
+            if (!localTime.IsActive)
             {
                 return;
             }

@@ -75,11 +75,18 @@ namespace BovineLabs.Timeline
                 {
                     UpdateHold(ref localTime, timerData, timeTransform, this.holds[entityIndexInQuery]);
                 }
+
+                CheckBounded(ref localTime, timeTransform);
             }
 
             private static void UpdateLocalTime(ref LocalTime localTime, in TimerData timerData, in TimeTransform timeTransform)
             {
                 localTime.Value = timeTransform.ToLocalTimeUnbound(timerData.Time);
+            }
+
+            private static void CheckBounded(ref LocalTime localTime, in TimeTransform timeTransform)
+            {
+                localTime.IsActive = timeTransform.IsLocalTimeBounded(localTime.Value);
             }
 
             private static void UpdateLoop(

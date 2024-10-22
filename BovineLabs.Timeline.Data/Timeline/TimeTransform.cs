@@ -44,6 +44,12 @@ namespace BovineLabs.Timeline.Data
             return ((time - this.start) * this.scale) + this.clipIn;
         }
 
+        public readonly bool IsLocalTimeBounded(DiscreteTime time)
+        {
+            var length = (this.end - this.start) * this.scale;
+            return time >= DiscreteTime.Zero && time <= length;
+        }
+
         public override bool Equals(object obj)
         {
             return obj is TimeTransform transform && this.Equals(transform);
